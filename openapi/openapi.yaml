@@ -48,6 +48,12 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Task'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         '200':
           description: The updated task
