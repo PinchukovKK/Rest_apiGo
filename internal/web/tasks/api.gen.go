@@ -17,10 +17,10 @@ import (
 // Task defines model for Task.
 type Task struct {
 	Id     *uint   `json:"id,omitempty"`
-	IsDone *bool   `json:"is_done,omitempty"`
 	Task   *string `json:"task,omitempty"`
+	IsDone *bool   `json:"is_done,omitempty"`
 }
-
+	
 // PatchTasksJSONRequestBody defines body for PatchTasks for application/json ContentType.
 type PatchTasksJSONRequestBody = Task
 
@@ -123,9 +123,9 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	}
 
 	router.GET(baseURL+"/tasks", wrapper.GetTasks)
-	router.PATCH(baseURL+"/tasks", wrapper.PatchTasks)
-	router.POST(baseURL+"/tasks", wrapper.PostTasks)
-	router.DELETE(baseURL+"/tasks/:id", wrapper.DeleteTasksId)
+	router.PATCH(baseURL+"/tasks/patch/:id", wrapper.PatchTasks)
+	router.POST(baseURL+"/tasks/post", wrapper.PostTasks)
+	router.DELETE(baseURL+"/tasks/delete/:id", wrapper.DeleteTasksId)
 
 }
 
@@ -146,6 +146,7 @@ func (response GetTasks200JSONResponse) VisitGetTasksResponse(w http.ResponseWri
 }
 
 type PatchTasksRequestObject struct {
+	Id   int `json:"id"`
 	Body *PatchTasksJSONRequestBody
 }
 

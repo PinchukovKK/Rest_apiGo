@@ -17,6 +17,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Task'
+  /tasks/post:
     post:
       summary: Create a new task
       tags:
@@ -35,6 +36,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Task'
+  /tasks/patch/{id}:
     patch:   
       summary: Update a task
       tags:

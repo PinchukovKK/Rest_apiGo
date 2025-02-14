@@ -4,6 +4,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"log"
+	"fmt"
 
 	"main.go/internal/database"
 	"main.go/internal/handlers"
@@ -23,6 +24,14 @@ func main() {
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+
+	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			c.Request().Header.Set("Content-Type", "application/json")
+			fmt.Println("Request Content-Type:", c.Request().Header.Get("Content-Type"))
+			return next(c)
+		}
+	})
 
 	strictHandler := tasks.NewStrictHandler(handler, nil)
 	tasks.RegisterHandlers(e, strictHandler)
