@@ -89,7 +89,7 @@ components:
       properties:
         id:
           type: integer
-          format: uint # так как в БД айди это только положительные числа.
+          format: uint
         task:
           type: string
         is_done:
