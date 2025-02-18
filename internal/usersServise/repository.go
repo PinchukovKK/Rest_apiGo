@@ -38,7 +38,7 @@ func (r *Repository) PatchUserById(id int, updateUser User) (User, error) {
 	if updateUser.Email != "" {
 		user.Email = updateUser.Email
 	}
-	if updateUser.Password != 0 {
+	if updateUser.Password != "" {
 		user.Password = updateUser.Password
 	}
 

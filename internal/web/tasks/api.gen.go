@@ -17,8 +17,8 @@ import (
 // Task defines model for Task.
 type Task struct {
 	Id     *uint   `json:"id,omitempty"`
-	Task   *string `json:"task,omitempty"`
 	IsDone *bool   `json:"is_done,omitempty"`
+	Task   *string `json:"task,omitempty"`
 }
 
 // PatchTasksPatchIdJSONRequestBody defines body for PatchTasksPatchId for application/json ContentType.
@@ -26,9 +26,6 @@ type PatchTasksPatchIdJSONRequestBody = Task
 
 // PostTasksPostJSONRequestBody defines body for PostTasksPost for application/json ContentType.
 type PostTasksPostJSONRequestBody = Task
-
-// DeleteTasksIdJSONRequestBody defines body for DeleteTasksId for application/json ContentType.
-type DeleteTasksIdJSONRequestBody = Task
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
@@ -188,8 +185,7 @@ func (response PostTasksPost201JSONResponse) VisitPostTasksPostResponse(w http.R
 }
 
 type DeleteTasksIdRequestObject struct {
-	Id   int `json:"id"`
-	Body *DeleteTasksIdJSONRequestBody
+	Id int `json:"id"`
 }
 
 type DeleteTasksIdResponseObject interface {
@@ -320,12 +316,6 @@ func (sh *strictHandler) DeleteTasksId(ctx echo.Context, id int) error {
 	var request DeleteTasksIdRequestObject
 
 	request.Id = id
-
-	var body DeleteTasksIdJSONRequestBody
-	if err := ctx.Bind(&body); err != nil {
-		return err
-	}
-	request.Body = &body
 
 	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
 		return sh.ssi.DeleteTasksId(ctx.Request().Context(), request.(DeleteTasksIdRequestObject))
