@@ -1,34 +1,34 @@
-package usersservise
+package userService
 
 import "gorm.io/gorm"
 
 type UserRepository interface {
-	GetUsers() (User, error)
+	GetUsers() ([]User, error)
 	PostUser(user User) (User, error)
 	PatchUserById(id int, updateUser User) (User, error)
 	DeleteUserById(id int) error
 }
 
-type Repository struct {
+type userRepository struct {
 	db *gorm.DB
 }
 
-func NewRepository (db *gorm.DB) *Repository {
-	return &Repository{db: db}
+func NewUserRepository (db *gorm.DB) *userRepository {
+	return &userRepository{db: db}
 }
 
-func (r *Repository) GetUsers() (User, error) {
-	var user User
+func (r *userRepository) GetUsers() ([]User, error) {
+	var user []User
 	err := r.db.Find(&user).Error
 	return user, err
 }
 
-func (r *Repository) PostUser(user User) (User, error) {
+func (r *userRepository) PostUser(user User) (User, error) {
 	err := r.db.Create(&user).Error
 	return user, err
 }
 
-func (r *Repository) PatchUserById(id int, updateUser User) (User, error) {
+func (r *userRepository) PatchUserById(id int, updateUser User) (User, error) {
 	var user User
 	result := r.db.First(&user, id)
 	if result.Error != nil {
@@ -46,7 +46,7 @@ func (r *Repository) PatchUserById(id int, updateUser User) (User, error) {
 	return user, err
 }
 
-func (r *Repository) DeleteUserById(id int) error {
+func (r *userRepository) DeleteUserById(id int) error {
 	var user User
 	result := r.db.First(&user, id)
 	if result.Error != nil {

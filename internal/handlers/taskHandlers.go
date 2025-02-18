@@ -7,15 +7,15 @@ import (
 	"main.go/internal/web/tasks"
 )
 
-type Handler struct {
+type taskHandler struct {
 	Service *taskService.TaskService
 }
 
-func NewHandler(service *taskService.TaskService) *Handler {
-	return &Handler{Service: service}
+func NewTaskHandler(service *taskService.TaskService) *taskHandler {
+	return &taskHandler{Service: service}
 }
 
-func (h Handler) GetTasks(_ context.Context, _ tasks.GetTasksRequestObject) (tasks.GetTasksResponseObject, error) {
+func (h taskHandler) GetTasks(_ context.Context, _ tasks.GetTasksRequestObject) (tasks.GetTasksResponseObject, error) {
 	allTasks, err := h.Service.GetAllTask()
 	if err != nil {
 		return nil, err
@@ -35,7 +35,7 @@ func (h Handler) GetTasks(_ context.Context, _ tasks.GetTasksRequestObject) (tas
 	return response, nil
 }
 
-func (h Handler) PostTasksPost(ctx context.Context, request tasks.PostTasksPostRequestObject) (tasks.PostTasksPostResponseObject, error) {
+func (h taskHandler) PostTasksPost(ctx context.Context, request tasks.PostTasksPostRequestObject) (tasks.PostTasksPostResponseObject, error) {
 	taskRequest := request.Body
 
 	taskToCreate := taskService.Task{
@@ -57,7 +57,7 @@ func (h Handler) PostTasksPost(ctx context.Context, request tasks.PostTasksPostR
 	return response, nil
 }
 
-func (h Handler) DeleteTasksId(ctx context.Context, request tasks.DeleteTasksIdRequestObject) (tasks.DeleteTasksIdResponseObject, error) {
+func (h taskHandler) DeleteTasksId(ctx context.Context, request tasks.DeleteTasksIdRequestObject) (tasks.DeleteTasksIdResponseObject, error) {
 	taskID := request.Id
 
 	err := h.Service.DeleteTask(uint(taskID))
@@ -68,7 +68,7 @@ func (h Handler) DeleteTasksId(ctx context.Context, request tasks.DeleteTasksIdR
 	return tasks.DeleteTasksId204Response{}, nil
 }
 
-func (h Handler) PatchTasksPatchId(ctx context.Context, request tasks.PatchTasksPatchIdRequestObject) (tasks.PatchTasksPatchIdResponseObject, error) {
+func (h taskHandler) PatchTasksPatchId(ctx context.Context, request tasks.PatchTasksPatchIdRequestObject) (tasks.PatchTasksPatchIdResponseObject, error) {
 	taskID := request.Id
 	taskRequestUpdate := request.Body
 

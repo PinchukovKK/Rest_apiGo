@@ -1,27 +1,33 @@
 package main
 
 import (
+	"fmt"
+	"log"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"log"
-	"fmt"
 
 	"main.go/internal/database"
 	"main.go/internal/handlers"
 	"main.go/internal/taskService"
+	"main.go/internal/userService"
 	"main.go/internal/web/tasks"
+	"main.go/internal/web/users"
 )
 
 func main() {
 	database.InitDB()
-	if err := database.DB.AutoMigrate(&taskService.Task{}); err != nil {
+	if err := database.DB.AutoMigrate(&taskService.Task{}, &userService.User{}); err != nil {
 		fmt.Println("No automigrate")
 	}
 
-	repo := taskService.NewTaskRepository(database.DB)
-	service := taskService.NewTaskService(repo)
+	taskRepo := taskService.NewTaskRepository(database.DB)
+	taskService := taskService.NewTaskService(taskRepo)
+	taskHandler := handlers.NewTaskHandler(taskService)
 
-	handler := handlers.NewHandler(service)
+	userRepo := userService.NewUserRepository(database.DB)
+	userService := userService.NewUserService(userRepo)
+	userHandler := handlers.NewUsersHandler(userService)
 
 	e := echo.New()
 	e.Use(middleware.Logger())
@@ -35,8 +41,11 @@ func main() {
 		}
 	})
 
-	strictHandler := tasks.NewStrictHandler(handler, nil)
-	tasks.RegisterHandlers(e, strictHandler)
+	taskStrictHandler := tasks.NewStrictHandler(taskHandler, nil)
+	tasks.RegisterHandlers(e, taskStrictHandler)
+
+	userStrictHandler := users.NewStrictHandler(userHandler, nil)
+	users.RegisterHandlers(e, userStrictHandler)
 
 	if err := e.Start(":8080"); err != nil {
 		log.Fatal(err)
