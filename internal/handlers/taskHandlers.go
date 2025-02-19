@@ -22,9 +22,10 @@ func (h taskHandler) GetTasks(_ context.Context, _ tasks.GetTasksRequestObject) 
 	}
 
 	response := tasks.GetTasks200JSONResponse{}
-
+	
 	for _, tsk := range allTasks {
 		task := tasks.Task{
+			UserId: &tsk.UserId,
 			Id:     &tsk.ID,
 			Task:   &tsk.Task,
 			IsDone: &tsk.IsDone,
@@ -39,10 +40,11 @@ func (h taskHandler) PostTasksPost(ctx context.Context, request tasks.PostTasksP
 	taskRequest := request.Body
 
 	taskToCreate := taskService.Task{
+		UserId: uint(*taskRequest.UserId),
 		Task:   *taskRequest.Task,
 		IsDone: *taskRequest.IsDone,
 	}
-	createdTask, err := h.Service.CreateTask(taskToCreate)
+	createdTask, err := h.Service.CreateTask(taskToCreate, taskToCreate.UserId)
 
 	if err != nil {
 		return nil, err
@@ -52,6 +54,7 @@ func (h taskHandler) PostTasksPost(ctx context.Context, request tasks.PostTasksP
 		Id:     &createdTask.ID,
 		Task:   &createdTask.Task,
 		IsDone: &createdTask.IsDone,
+		UserId: &createdTask.UserId,
 	}
 
 	return response, nil

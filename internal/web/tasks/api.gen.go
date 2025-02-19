@@ -19,6 +19,12 @@ type Task struct {
 	Id     *uint   `json:"id,omitempty"`
 	IsDone *bool   `json:"is_done,omitempty"`
 	Task   *string `json:"task,omitempty"`
+	UserId *uint    `json:"user_id,omitempty"`
+}
+
+// GetTasksParams defines parameters for GetTasks.
+type GetTasksParams struct {
+	UserId uint `form:"user_id" json:"user_id"`
 }
 
 // PatchTasksPatchIdJSONRequestBody defines body for PatchTasksPatchId for application/json ContentType.
@@ -31,7 +37,7 @@ type PostTasksPostJSONRequestBody = Task
 type ServerInterface interface {
 	// Get all tasks
 	// (GET /tasks)
-	GetTasks(ctx echo.Context) error
+	GetTasks(ctx echo.Context, params GetTasksParams) error
 	// Update a task
 	// (PATCH /tasks/patch/{id})
 	PatchTasksPatchId(ctx echo.Context, id int) error
@@ -52,8 +58,17 @@ type ServerInterfaceWrapper struct {
 func (w *ServerInterfaceWrapper) GetTasks(ctx echo.Context) error {
 	var err error
 
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetTasksParams
+	// ------------- Required query parameter "user_id" -------------
+
+	err = runtime.BindQueryParameter("form", true, true, "user_id", ctx.QueryParams(), &params.UserId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter user_id: %s", err))
+	}
+
 	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.GetTasks(ctx)
+	err = w.Handler.GetTasks(ctx, params)
 	return err
 }
 
@@ -134,6 +149,7 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 }
 
 type GetTasksRequestObject struct {
+	Params GetTasksParams
 }
 
 type GetTasksResponseObject interface {
@@ -229,8 +245,10 @@ type strictHandler struct {
 }
 
 // GetTasks operation middleware
-func (sh *strictHandler) GetTasks(ctx echo.Context) error {
+func (sh *strictHandler) GetTasks(ctx echo.Context, params GetTasksParams) error {
 	var request GetTasksRequestObject
+
+	request.Params = params
 
 	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
 		return sh.ssi.GetTasks(ctx.Request().Context(), request.(GetTasksRequestObject))

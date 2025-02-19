@@ -8,10 +8,6 @@ func NewUserService(repo UserRepository) *UserService {
 	return &UserService{repo: repo}
 }
 
-func (s *UserService) GetUsers() ([]User, error) {
-	return s.repo.GetUsers()
-}
-
 func (s *UserService) CreateUser(user User) (User, error) {
 	return s.repo.PostUser(user)
 }
@@ -22,5 +18,9 @@ func (s *UserService) PatchUser(id int, updateUser User) (User, error) {
 
 func (s *UserService) DeleteUser(id int) error {
 	return s.repo.DeleteUserById(id)
+}
+
+func (s *UserService) GetUsers() ([]User, error) {
+	return s.repo.GetUsers()
 }
 

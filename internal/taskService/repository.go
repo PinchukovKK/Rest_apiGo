@@ -3,7 +3,7 @@ package taskService
 import "gorm.io/gorm"
 
 type TaskRepository interface {
-	CreateTask(task Task) (Task, error)
+	CreateTask(task Task, userID uint) (Task, error)
 	GetAllTask() ([]Task, error)
 	UpdateTask(id uint, task Task) (Task, error)
 	DeleteTask(id uint) error
@@ -17,7 +17,8 @@ func NewTaskRepository(db *gorm.DB) *taskRepository {
 	return &taskRepository{db: db}
 }
 
-func (r *taskRepository) CreateTask(task Task) (Task, error) {
+func (r *taskRepository) CreateTask(task Task, userID uint) (Task, error) {
+	task.UserId = userID
 	result := r.db.Create(&task)
 	if result.Error != nil {
 		return Task{}, result.Error
@@ -26,9 +27,9 @@ func (r *taskRepository) CreateTask(task Task) (Task, error) {
 }
 
 func (r *taskRepository) GetAllTask() ([]Task, error) {
-	var task []Task
-	err := r.db.Find(&task).Error
-	return task, err
+	var tasks []Task
+    err := r.db.Find(&tasks).Error
+    return tasks, err
 }
 
 func (r *taskRepository) UpdateTask(id uint, updatedTask Task) (Task, error) {

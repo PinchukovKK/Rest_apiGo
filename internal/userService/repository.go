@@ -1,6 +1,9 @@
 package userService
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+	"main.go/internal/taskService"
+)
 
 type UserRepository interface {
 	GetUsers() ([]User, error)
@@ -20,6 +23,15 @@ func NewUserRepository (db *gorm.DB) *userRepository {
 func (r *userRepository) GetUsers() ([]User, error) {
 	var user []User
 	err := r.db.Find(&user).Error
+
+	for i := range user {
+		tasks, err := r.GetTasksForUser(user[i].ID)
+		if err != nil {
+			return nil, err
+		}
+		user[i].Task = tasks
+	}
+
 	return user, err
 }
 
@@ -55,4 +67,13 @@ func (r *userRepository) DeleteUserById(id int) error {
 
 	err := r.db.Delete(&user).Error
 	return err
+}
+
+func (r *userRepository) GetTasksForUser(userID uint) ([]taskService.Task, error) {
+	var task []taskService.Task
+	if err := r.db.Where("user_id = ?", userID).Find(&task).Error; err != nil {
+		return nil, err
+	}
+
+	return task, nil
 }

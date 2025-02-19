@@ -9,6 +9,13 @@ paths:
       summary: Get all tasks
       tags:
         - tasks
+      parameters:
+        - name: user_id
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: uint
       responses:
         '200':
           description: A list of tasks
@@ -162,10 +169,12 @@ components:
           type: string
         is_done:
           type: boolean
+        user_id:
+          type: integer
     User:
       type: object
       properties:
-        id:
+        user_id:
           type: integer
           format: uint
         email:

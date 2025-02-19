@@ -16,9 +16,9 @@ import (
 
 // User defines model for User.
 type User struct {
-	Id       *uint   `json:"id,omitempty"`
 	Email    *string `json:"email,omitempty"`
 	Password *string `json:"password,omitempty"`
+	UserId   *uint   `json:"user_id,omitempty"`
 }
 
 // PatchUsersByIdJSONRequestBody defines body for PatchUsersById for application/json ContentType.
@@ -130,6 +130,7 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.PATCH(baseURL+"/users/:id", wrapper.PatchUsersById)
 	router.DELETE(baseURL+"/users/:id", wrapper.DeleteUsersDeleteId)
 	router.POST(baseURL+"/users", wrapper.PostUsersPost)
+
 }
 
 type GetUsersRequestObject struct {
