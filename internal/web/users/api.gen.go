@@ -22,10 +22,10 @@ type User struct {
 }
 
 // PatchUsersByIdJSONRequestBody defines body for PatchUsersById for application/json ContentType.
-type PatchUsersByIdJSONRequestBody = User
+type PatchUsersIdJSONRequestBody = User
 
 // PostUsersPostJSONRequestBody defines body for PostUsersPost for application/json ContentType.
-type PostUsersPostJSONRequestBody = User
+type PostUsersJSONRequestBody = User
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
@@ -34,13 +34,13 @@ type ServerInterface interface {
 	GetUsers(ctx echo.Context) error
 	// Update a user
 	// (PATCH /users/by/{id})
-	PatchUsersById(ctx echo.Context, id int) error
+	PatchUsersId(ctx echo.Context, id int) error
 	// Delete a user
 	// (DELETE /users/delete/{id})
-	DeleteUsersDeleteId(ctx echo.Context, id int) error
+	DeleteUsersId(ctx echo.Context, id int) error
 	// Create a new user
 	// (POST /users/post)
-	PostUsersPost(ctx echo.Context) error
+	PostUsers(ctx echo.Context) error
 }
 
 // ServerInterfaceWrapper converts echo contexts to parameters.
@@ -58,7 +58,7 @@ func (w *ServerInterfaceWrapper) GetUsers(ctx echo.Context) error {
 }
 
 // PatchUsersById converts echo context to params.
-func (w *ServerInterfaceWrapper) PatchUsersById(ctx echo.Context) error {
+func (w *ServerInterfaceWrapper) PatchUsersId(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "id" -------------
 	var id int
@@ -69,12 +69,12 @@ func (w *ServerInterfaceWrapper) PatchUsersById(ctx echo.Context) error {
 	}
 
 	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.PatchUsersById(ctx, id)
+	err = w.Handler.PatchUsersId(ctx, id)
 	return err
 }
 
 // DeleteUsersDeleteId converts echo context to params.
-func (w *ServerInterfaceWrapper) DeleteUsersDeleteId(ctx echo.Context) error {
+func (w *ServerInterfaceWrapper) DeleteUsersId(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "id" -------------
 	var id int
@@ -85,16 +85,16 @@ func (w *ServerInterfaceWrapper) DeleteUsersDeleteId(ctx echo.Context) error {
 	}
 
 	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.DeleteUsersDeleteId(ctx, id)
+	err = w.Handler.DeleteUsersId(ctx, id)
 	return err
 }
 
 // PostUsersPost converts echo context to params.
-func (w *ServerInterfaceWrapper) PostUsersPost(ctx echo.Context) error {
+func (w *ServerInterfaceWrapper) PostUsers(ctx echo.Context) error {
 	var err error
 
 	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.PostUsersPost(ctx)
+	err = w.Handler.PostUsers(ctx)
 	return err
 }
 
@@ -127,9 +127,9 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	}
 
 	router.GET(baseURL+"/users", wrapper.GetUsers)
-	router.PATCH(baseURL+"/users/:id", wrapper.PatchUsersById)
-	router.DELETE(baseURL+"/users/:id", wrapper.DeleteUsersDeleteId)
-	router.POST(baseURL+"/users", wrapper.PostUsersPost)
+	router.PATCH(baseURL+"/users/:id", wrapper.PatchUsersId)
+	router.DELETE(baseURL+"/users/:id", wrapper.DeleteUsersId)
+	router.POST(baseURL+"/users", wrapper.PostUsers)
 
 }
 
@@ -149,51 +149,51 @@ func (response GetUsers200JSONResponse) VisitGetUsersResponse(w http.ResponseWri
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchUsersByIdRequestObject struct {
+type PatchUsersIdRequestObject struct {
 	Id   int `json:"id"`
-	Body *PatchUsersByIdJSONRequestBody
+	Body *PatchUsersIdJSONRequestBody
 }
 
-type PatchUsersByIdResponseObject interface {
-	VisitPatchUsersByIdResponse(w http.ResponseWriter) error
+type PatchUsersIdResponseObject interface {
+	VisitPatchUsersIdResponse(w http.ResponseWriter) error
 }
 
-type PatchUsersById200JSONResponse User
+type PatchUsersId200JSONResponse User
 
-func (response PatchUsersById200JSONResponse) VisitPatchUsersByIdResponse(w http.ResponseWriter) error {
+func (response PatchUsersId200JSONResponse) VisitPatchUsersIdResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteUsersDeleteIdRequestObject struct {
+type DeleteUsersIdRequestObject struct {
 	Id int `json:"id"`
 }
 
-type DeleteUsersDeleteIdResponseObject interface {
+type DeleteUsersIdResponseObject interface {
 	VisitDeleteUsersDeleteIdResponse(w http.ResponseWriter) error
 }
 
-type DeleteUsersDeleteId204Response struct {
+type DeleteUsersId204Response struct {
 }
 
-func (response DeleteUsersDeleteId204Response) VisitDeleteUsersDeleteIdResponse(w http.ResponseWriter) error {
+func (response DeleteUsersId204Response) VisitDeleteUsersDeleteIdResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
 	return nil
 }
 
-type PostUsersPostRequestObject struct {
-	Body *PostUsersPostJSONRequestBody
+type PostUsersRequestObject struct {
+	Body *PostUsersJSONRequestBody
 }
 
-type PostUsersPostResponseObject interface {
+type PostUsersResponseObject interface {
 	VisitPostUsersPostResponse(w http.ResponseWriter) error
 }
 
-type PostUsersPost201JSONResponse User
+type PostUsers201JSONResponse User
 
-func (response PostUsersPost201JSONResponse) VisitPostUsersPostResponse(w http.ResponseWriter) error {
+func (response PostUsers201JSONResponse) VisitPostUsersPostResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(201)
 
@@ -207,13 +207,13 @@ type StrictServerInterface interface {
 	GetUsers(ctx context.Context, request GetUsersRequestObject) (GetUsersResponseObject, error)
 	// Update a user
 	// (PATCH /users/by/{id})
-	PatchUsersById(ctx context.Context, request PatchUsersByIdRequestObject) (PatchUsersByIdResponseObject, error)
+	PatchUsersId(ctx context.Context, request PatchUsersIdRequestObject) (PatchUsersIdResponseObject, error)
 	// Delete a user
 	// (DELETE /users/delete/{id})
-	DeleteUsersDeleteId(ctx context.Context, request DeleteUsersDeleteIdRequestObject) (DeleteUsersDeleteIdResponseObject, error)
+	DeleteUsersId(ctx context.Context, request DeleteUsersIdRequestObject) (DeleteUsersIdResponseObject, error)
 	// Create a new user
 	// (POST /users/post)
-	PostUsersPost(ctx context.Context, request PostUsersPostRequestObject) (PostUsersPostResponseObject, error)
+	PostUsers(ctx context.Context, request PostUsersRequestObject) (PostUsersResponseObject, error)
 }
 
 type StrictHandlerFunc = strictecho.StrictEchoHandlerFunc
@@ -252,19 +252,19 @@ func (sh *strictHandler) GetUsers(ctx echo.Context) error {
 }
 
 // PatchUsersById operation middleware
-func (sh *strictHandler) PatchUsersById(ctx echo.Context, id int) error {
-	var request PatchUsersByIdRequestObject
+func (sh *strictHandler) PatchUsersId(ctx echo.Context, id int) error {
+	var request PatchUsersIdRequestObject
 
 	request.Id = id
 
-	var body PatchUsersByIdJSONRequestBody
+	var body PatchUsersIdJSONRequestBody
 	if err := ctx.Bind(&body); err != nil {
 		return err
 	}
 	request.Body = &body
 
 	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.PatchUsersById(ctx.Request().Context(), request.(PatchUsersByIdRequestObject))
+		return sh.ssi.PatchUsersId(ctx.Request().Context(), request.(PatchUsersIdRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "PatchUsersById")
@@ -274,8 +274,8 @@ func (sh *strictHandler) PatchUsersById(ctx echo.Context, id int) error {
 
 	if err != nil {
 		return err
-	} else if validResponse, ok := response.(PatchUsersByIdResponseObject); ok {
-		return validResponse.VisitPatchUsersByIdResponse(ctx.Response())
+	} else if validResponse, ok := response.(PatchUsersIdResponseObject); ok {
+		return validResponse.VisitPatchUsersIdResponse(ctx.Response())
 	} else if response != nil {
 		return fmt.Errorf("unexpected response type: %T", response)
 	}
@@ -283,13 +283,13 @@ func (sh *strictHandler) PatchUsersById(ctx echo.Context, id int) error {
 }
 
 // DeleteUsersDeleteId operation middleware
-func (sh *strictHandler) DeleteUsersDeleteId(ctx echo.Context, id int) error {
-	var request DeleteUsersDeleteIdRequestObject
+func (sh *strictHandler) DeleteUsersId(ctx echo.Context, id int) error {
+	var request DeleteUsersIdRequestObject
 
 	request.Id = id
 
 	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.DeleteUsersDeleteId(ctx.Request().Context(), request.(DeleteUsersDeleteIdRequestObject))
+		return sh.ssi.DeleteUsersId(ctx.Request().Context(), request.(DeleteUsersIdRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "DeleteUsersDeleteId")
@@ -299,7 +299,7 @@ func (sh *strictHandler) DeleteUsersDeleteId(ctx echo.Context, id int) error {
 
 	if err != nil {
 		return err
-	} else if validResponse, ok := response.(DeleteUsersDeleteIdResponseObject); ok {
+	} else if validResponse, ok := response.(DeleteUsersIdResponseObject); ok {
 		return validResponse.VisitDeleteUsersDeleteIdResponse(ctx.Response())
 	} else if response != nil {
 		return fmt.Errorf("unexpected response type: %T", response)
@@ -308,17 +308,17 @@ func (sh *strictHandler) DeleteUsersDeleteId(ctx echo.Context, id int) error {
 }
 
 // PostUsersPost operation middleware
-func (sh *strictHandler) PostUsersPost(ctx echo.Context) error {
-	var request PostUsersPostRequestObject
+func (sh *strictHandler) PostUsers(ctx echo.Context) error {
+	var request PostUsersRequestObject
 
-	var body PostUsersPostJSONRequestBody
+	var body PostUsersJSONRequestBody
 	if err := ctx.Bind(&body); err != nil {
 		return err
 	}
 	request.Body = &body
 
 	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.PostUsersPost(ctx.Request().Context(), request.(PostUsersPostRequestObject))
+		return sh.ssi.PostUsers(ctx.Request().Context(), request.(PostUsersRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "PostUsersPost")
@@ -328,7 +328,7 @@ func (sh *strictHandler) PostUsersPost(ctx echo.Context) error {
 
 	if err != nil {
 		return err
-	} else if validResponse, ok := response.(PostUsersPostResponseObject); ok {
+	} else if validResponse, ok := response.(PostUsersResponseObject); ok {
 		return validResponse.VisitPostUsersPostResponse(ctx.Response())
 	} else if response != nil {
 		return fmt.Errorf("unexpected response type: %T", response)
